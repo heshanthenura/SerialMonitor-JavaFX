@@ -1,0 +1,20 @@
+/*#textArea {*/
+/*    -fx-control-inner-background:black;*/
+/*    -fx-background-color: black;*/
+/*    -fx-border-radius: 0px;*/
+/*}*/
+
+#textArea {
+    -fx-background-color: black;
+    -fx-control-inner-background: black;
+    -fx-text-fill: white;
+    -fx-background-radius: 0;
+
+}
+
+#textArea .viewport {
+    -fx-background-color: black;
+}
+#textArea .content {
+    -fx-background-insets: 0;
+}
