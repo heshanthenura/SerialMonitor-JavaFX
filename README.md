@@ -12,7 +12,7 @@ Serial Monitor is a JavaFX application for monitoring data from a serial port.
 
 ## Screenshots
 
-![Serial Monitor](screenshots/serial-monitor.png)
+![Serial Monitor](https://user-images.githubusercontent.com/75155192/250349792-c7f22612-5915-4887-8962-e00a50d4d153.png)
 
 ## Getting Started
 
