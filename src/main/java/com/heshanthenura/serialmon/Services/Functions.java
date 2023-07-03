@@ -1,6 +1,7 @@
 package com.heshanthenura.serialmon.Services;
 
 import com.fazecast.jSerialComm.SerialPort;
+import javafx.application.Platform;
 import javafx.scene.control.TextArea;
 
 import java.io.BufferedReader;
@@ -30,6 +31,7 @@ public class Functions {
                 String line;
                 while ((line = bufferedReader.readLine()) != null) {
                     System.out.println("Received data: " + line);
+                    System.out.println("Test Data");
 //                        textArea.appendText(line+"\n");
                 }
 
@@ -54,18 +56,20 @@ public class Functions {
         Thread readThread = new Thread(() -> {
             try {
                 InputStream inputStream = comPort.getInputStream();
+                InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-                while (true) {
-                    int data = inputStream.read();
-                    if (data == -1) {
-                        // End of stream reached
-                        break;
-                    }
-                    System.out.print((char) data);
-                    // textArea.appendText(String.valueOf((char) data));
-                }
+                String line;
+                while ((line = bufferedReader.readLine()) != null) {
+                    System.out.println("Received data: " + line);
+                    System.out.println("Test Data");
+
+                    // If you want to update the UI with the received data, use Platform.runLater()
+                                }
 
                 System.out.println("Done");
+                bufferedReader.close();
+                inputStreamReader.close();
                 inputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -73,6 +77,7 @@ public class Functions {
         });
         readThread.start();
     }
+
 
 
     public static void main(String[] args) {

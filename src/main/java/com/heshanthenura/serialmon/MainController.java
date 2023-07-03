@@ -5,6 +5,10 @@ import com.heshanthenura.serialmon.Services.SerialReader;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 
@@ -51,6 +55,16 @@ public class MainController implements Initializable {
     @FXML
     private TextArea errorField;
 
+
+    @FXML
+    private LineChart<?, ?> chart;
+
+    @FXML
+    private CategoryAxis xAxis;
+
+    @FXML
+    private NumberAxis yAxis;
+
     SerialReader serialReader = new SerialReader();
 
     public void portSelected(ActionEvent actionEvent) {
@@ -74,7 +88,6 @@ public class MainController implements Initializable {
         }
 
     }
-
 
     @FXML
     void scanPorts(MouseEvent event) {
@@ -109,7 +122,6 @@ public class MainController implements Initializable {
 
     }
 
-
     @FXML
     void start(MouseEvent event) {
 
@@ -124,12 +136,12 @@ public class MainController implements Initializable {
 
     @FXML
     void stop(MouseEvent event) {
-
         startBtn.setDisable(false);
         stopBtn.setDisable(true);
         serialReader.StopSerialReader();
 
     }
+
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -145,6 +157,14 @@ public class MainController implements Initializable {
         });
 
         stopBtn.setDisable(true);
+
+        XYChart.Series series = new XYChart.Series();
+        series.getData().add(new XYChart.Data("1.5",23));
+        series.getData().add(new XYChart.Data("2.2",30));
+        series.getData().add(new XYChart.Data("3",32));
+        series.getData().add(new XYChart.Data("4",36));
+        series.getData().add(new XYChart.Data("5",40));
+        chart.getData().addAll(series);
 
     }
 

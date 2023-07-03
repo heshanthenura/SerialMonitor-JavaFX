@@ -7,56 +7,70 @@ import javafx.application.Platform;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextArea;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 public class SerialReader {
 
-    private SerialPort comPort;
+    public SerialPort comPort;
     private Thread readThread;
     private InputStream inputStream;
     private TextArea textArea;
 
-    public void SerialReader(String port, int baudRate, TextArea textArea, TextArea errorField,Button startBtn,Button stopBtn) {
+    public void SerialReader(String port, int baudRate, TextArea textArea, TextArea errorField, Button startBtn, Button stopBtn) {
         if (port != null && !port.trim().isEmpty() && baudRate != 0) {
             comPort = SerialPort.getCommPort(port);
             comPort.openPort();
-            comPort.setComPortTimeouts(SerialPort.TIMEOUT_NONBLOCKING, 0, 0);
+            comPort.setComPortTimeouts(SerialPort.TIMEOUT_READ_SEMI_BLOCKING, 0, 0);
             comPort.setBaudRate(baudRate);
-
             this.textArea = textArea;
             inputStream = comPort.getInputStream();
 
             readThread = new Thread(() -> {
                 try {
-                    byte[] buffer = new byte[1024];
-                    int numBytes;
+                    InputStreamReader inputStreamReader = new InputStreamReader(inputStream);
+                    BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
-                    while (!Thread.currentThread().isInterrupted()) {
+                    String line;
+                    while ((line = bufferedReader.readLine()) != null && !Thread.currentThread().isInterrupted()) {
                         try {
-                            numBytes = inputStream.read(buffer);
-                            if (numBytes > 0) {
-                                String data = new String(buffer, 0, numBytes);
-                                Platform.runLater(() -> textArea.appendText(data));
-                            }
-                        } catch (SerialPortTimeoutException e) {
-                            // Handle timeout exception
-                            // You can print an error message or handle it as needed
-                            // Here, we don't print any message when a timeout occurs without any data
-                        } catch (SerialPortIOException e) {
-                            System.out.println("Port Busy");
-                            Platform.runLater(() -> errorField.appendText("Port: " + port + " appears to be busy or used by another app"));
-                            startBtn.setDisable(true);
-                            stopBtn.setDisable(false);
-                            break;
+                            String finalLine = line;
+                            Platform.runLater(() -> {
+                                textArea.appendText(finalLine + "\n");
+                                try {
+                                    new Plotter().plotter(finalLine);
+                                } catch (InterruptedException e) {
+                                    throw new RuntimeException(e);
+                                }
+                            });
                         } catch (Exception e) {
                             System.out.println("Error Reading Port");
-                            startBtn.setDisable(true);
-                            stopBtn.setDisable(false);
+                            Platform.runLater(() -> {
+                                startBtn.setDisable(true);
+                                stopBtn.setDisable(false);
+                                errorField.appendText(e + "\n");
+                            });
                             e.printStackTrace();
                         }
                     }
+                } catch (SerialPortTimeoutException e) {
+                    // Handle timeout exception
+                } catch (SerialPortIOException e) {
+                    System.out.println("Port Busy");
+                    Platform.runLater(() -> {
+                        startBtn.setDisable(true);
+                        stopBtn.setDisable(false);
+                        errorField.appendText("Port: " + port + " appears to be busy or used by another app\n");
+                    });
+                    e.printStackTrace();
                 } catch (Exception e) {
                     System.out.println("Error Reading Port");
+                    Platform.runLater(() -> {
+                        startBtn.setDisable(true);
+                        stopBtn.setDisable(false);
+                        errorField.appendText(e + "\n");
+                    });
                     e.printStackTrace();
                 } finally {
                     closeResources();
@@ -65,11 +79,11 @@ public class SerialReader {
 
             readThread.start();
         } else {
-            if(!(port != null && !port.trim().isEmpty())){
-                Platform.runLater(() -> errorField.appendText("Port Seems to be empty or Unavailable"+"\n"));
+            if (!(port != null && !port.trim().isEmpty())) {
+                Platform.runLater(() -> errorField.appendText("Port Seems to be empty or Unavailable\n"));
             }
-            if (baudRate == 0){
-                Platform.runLater(() -> errorField.appendText("Baud Rate Seems to be empty or Unavailable"+"\n"));
+            if (baudRate == 0) {
+                Platform.runLater(() -> errorField.appendText("Baud Rate Seems to be empty or Unavailable\n"));
             }
             startBtn.setDisable(true);
             stopBtn.setDisable(false);
@@ -77,20 +91,31 @@ public class SerialReader {
     }
 
     public void StopSerialReader() {
-        if (readThread != null && readThread.isAlive()) {
-            readThread.interrupt();
+        try {
+            Thread thread = new Thread(() -> {
+                try {
+                    if (readThread != null && readThread.isAlive()) {
+                        readThread.interrupt();
+                        comPort.closePort();
+                        try {
+                            readThread.join();
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
 
-            try {
-                readThread.join();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+                        closeResources();
 
-            closeResources();
-
-            System.out.println("Serial reader stopped");
-        } else {
-            System.out.println("Serial reader is not running");
+                        System.out.println("Serial reader stopped");
+                    } else {
+                        System.out.println("Serial reader is not running");
+                    }
+                } catch (Exception e) {
+                    System.out.println("Error Stopping");
+                }
+            });
+            thread.start();
+        } catch (Exception e) {
+            System.out.println("Error Stopping");
         }
     }
 
