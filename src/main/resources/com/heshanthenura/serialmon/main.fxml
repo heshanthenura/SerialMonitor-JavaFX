@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
@@ -94,7 +95,7 @@
                <children>
                   <VBox alignment="CENTER" prefHeight="200.0" prefWidth="100.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <children>
-                        <LineChart fx:id="chart" alternativeColumnFillVisible="true" legendVisible="false" prefHeight="484.0" title="Plotter" VBox.vgrow="ALWAYS">
+                        <LineChart fx:id="chart" alternativeColumnFillVisible="true" createSymbols="false" legendVisible="false" prefHeight="484.0" title="Plotter" VBox.vgrow="ALWAYS">
                           <xAxis>
                             <CategoryAxis fx:id="xAxis" />
                           </xAxis>
@@ -102,13 +103,37 @@
                             <NumberAxis fx:id="yAxis" side="LEFT" />
                           </yAxis>
                         </LineChart>
-                        <AnchorPane layoutX="10.0" layoutY="10.0" maxHeight="100.0" VBox.vgrow="NEVER">
+                        <AnchorPane layoutX="10.0" layoutY="10.0" maxHeight="100.0" minHeight="87.0" prefHeight="87.0" VBox.vgrow="NEVER">
                            <VBox.margin>
                               <Insets />
                            </VBox.margin>
                            <padding>
                               <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                            </padding>
+                           <children>
+                              <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <children>
+                                    <VBox alignment="TOP_CENTER" spacing="4.0">
+                                       <children>
+                                          <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Enter Variable Name" />
+                                          <HBox prefWidth="200.0" spacing="5.0">
+                                             <children>
+                                                <TextField fx:id="variableInput" alignment="CENTER" />
+                                                <Button fx:id="addBtn" mnemonicParsing="false" onMouseClicked="#addVariable" text="Add" />
+                                             </children>
+                                          </HBox>
+                                       </children>
+                                    </VBox>
+                                    <ScrollPane pannable="true" prefHeight="200.0" prefWidth="200.0" />
+                                    <VBox alignment="CENTER" spacing="19.0">
+                                       <children>
+                                          <Button fx:id="StartPlotBtn" mnemonicParsing="false" onMouseClicked="#startPlot" text="START PLOT" />
+                                          <Button fx:id="StopPlotBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onMouseClicked="#stopPlot" prefWidth="81.0" text="STOP PLOT" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </HBox>
+                           </children>
                         </AnchorPane>
                      </children>
                   </VBox>

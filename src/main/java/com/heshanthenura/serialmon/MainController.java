@@ -1,5 +1,6 @@
 package com.heshanthenura.serialmon;
 
+import com.heshanthenura.serialmon.Services.Plotter;
 import com.heshanthenura.serialmon.Services.PortList;
 import com.heshanthenura.serialmon.Services.SerialReader;
 import javafx.event.ActionEvent;
@@ -18,10 +19,20 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 
+import static com.heshanthenura.serialmon.Services.Plotter.PlotVariable;
+import static com.heshanthenura.serialmon.Services.Plotter.plotStatus;
+
 public class MainController implements Initializable {
     String selectedPort = null;
 
     int baudRate=0;
+
+    @FXML
+    private Button StartPlotBtn;
+
+    @FXML
+    private Button StopPlotBtn;
+
 
     @FXML
     private ChoiceBox<String> PortListBtn;
@@ -57,13 +68,19 @@ public class MainController implements Initializable {
 
 
     @FXML
-    private LineChart<?, ?> chart;
+    public LineChart<?, ?> chart;
 
     @FXML
     private CategoryAxis xAxis;
 
     @FXML
     private NumberAxis yAxis;
+
+    @FXML
+    private Button addBtn;
+
+    @FXML
+    private TextField variableInput;
 
     SerialReader serialReader = new SerialReader();
 
@@ -142,6 +159,24 @@ public class MainController implements Initializable {
 
     }
 
+    @FXML
+    void startPlot(MouseEvent event) {
+        plotStatus=true;
+        StartPlotBtn.setDisable(true);
+        StopPlotBtn.setDisable(false);
+    }
+
+    @FXML
+    void stopPlot(MouseEvent event) {
+        plotStatus=false;
+        StartPlotBtn.setDisable(false);
+        StopPlotBtn.setDisable(true);
+    }
+
+    @FXML
+    void addVariable(MouseEvent event) {
+        PlotVariable=variableInput.getText();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -157,15 +192,19 @@ public class MainController implements Initializable {
         });
 
         stopBtn.setDisable(true);
+        StopPlotBtn.setDisable(true);
 
-        XYChart.Series series = new XYChart.Series();
-        series.getData().add(new XYChart.Data("1.5",23));
-        series.getData().add(new XYChart.Data("2.2",30));
-        series.getData().add(new XYChart.Data("3",32));
-        series.getData().add(new XYChart.Data("4",36));
-        series.getData().add(new XYChart.Data("5",40));
-        chart.getData().addAll(series);
+//        XYChart.Series series = new XYChart.Series();
+//        series.getData().add(new XYChart.Data("1.5",23));
+//        series.getData().add(new XYChart.Data("2.2",30));
+//        series.getData().add(new XYChart.Data("3",32));
+//        series.getData().add(new XYChart.Data("4",36));
+//        series.getData().add(new XYChart.Data("5",40));
+//        chart.getData().addAll(series);
 
+        Plotter.SetupPlotter(chart);
+        Plotter.SetupTime();
+        chart.setStyle("-fx-stroke-width: 1px;");
     }
 
 }
